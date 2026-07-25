@@ -1,7 +1,7 @@
 # Cloud Tasks CI/CD Lab
 
-Microservicio FastAPI de tareas, 100% local, contra AWS emulado con LocalStack (DynamoDB, S3, SQS),
-infra como código en CDK, empaquetado en Docker, orquestado en Kubernetes local (kind) y validado
-por un pipeline de GitHub Actions.
+FastAPI task microservice, 100% local, against AWS emulated with LocalStack (DynamoDB, S3, SQS),
+infrastructure as code with CDK, packaged in Docker, orchestrated on local Kubernetes (kind), and
+validated by a GitHub Actions pipeline.
 
-> En construcción — ver el plan de fases en la LLM Wiki del proyecto.
+> Work in progress — see the phase plan in the project's LLM Wiki.
