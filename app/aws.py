@@ -1,7 +1,7 @@
-"""Fábrica única de clientes boto3 (ver wiki: config-endpoint-aws).
+"""Single factory for boto3 clients (see wiki: config-endpoint-aws).
 
-Ningún cliente boto3 se crea fuera de este módulo. Si `AWS_ENDPOINT_URL` está seteada
-(p. ej. apuntando a LocalStack), los clientes usan ese endpoint; si está vacía, apuntan a AWS real.
+No boto3 client is created outside this module. If `AWS_ENDPOINT_URL` is set
+(e.g. pointing to LocalStack), clients use that endpoint; if empty, they point to real AWS.
 """
 
 from typing import Any

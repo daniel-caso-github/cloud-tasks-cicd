@@ -1,10 +1,10 @@
-"""Configuración de la app leída desde el entorno (ver wiki: config-por-entorno)."""
+"""App configuration read from the environment (see wiki: config-por-entorno)."""
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Variables de entorno de la app. Defaults sensatos para dev local (`*-local`)."""
+    """App environment variables. Sensible defaults for local dev (`*-local`)."""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -21,5 +21,5 @@ class Settings(BaseSettings):
 
 
 def get_settings() -> Settings:
-    """Devuelve las settings leyendo el entorno actual."""
+    """Return the settings read from the current environment."""
     return Settings()

@@ -1,7 +1,7 @@
-"""Worker consumidor de eventos SQS (ver wiki: worker-sqs).
+"""SQS event consumer worker (see wiki: worker-sqs).
 
-Bucle receive -> process -> delete, con long polling y backoff cuando la cola está vacía.
-Marca la Task correspondiente como `processed` en DynamoDB. Corre como proceso aparte, sin HTTP.
+Receive -> process -> delete loop, with long polling and backoff when the queue is empty.
+Marks the corresponding Task as `processed` in DynamoDB. Runs as a separate process, no HTTP.
 """
 
 import json
@@ -24,7 +24,7 @@ def _queue_url() -> str:
 
 
 def process_message(body: str) -> None:
-    """Procesa un mensaje: marca la Task como `processed`. Idempotente."""
+    """Process a message: marks the Task as `processed`. Idempotent."""
     event = json.loads(body)
     task_id = event["task_id"]
     task = tasks_repository.get_task(task_id)
@@ -37,7 +37,7 @@ def process_message(body: str) -> None:
 
 
 def run() -> None:
-    """Bucle principal del worker: long polling sobre EVENTS_QUEUE."""
+    """Main worker loop: long polling over EVENTS_QUEUE."""
     queue_url = _queue_url()
     client = sqs_client()
     while True:

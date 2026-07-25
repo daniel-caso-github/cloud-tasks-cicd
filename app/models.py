@@ -1,4 +1,4 @@
-"""Modelos Pydantic de dominio (ver wiki: task)."""
+"""Pydantic domain models (see wiki: task)."""
 
 from datetime import datetime, timezone
 from enum import StrEnum

@@ -1,4 +1,4 @@
-"""Acceso a SQS para eventos de tareas (ver wiki: worker-sqs, naming-recursos)."""
+"""SQS access for task events (see wiki: worker-sqs, naming-recursos)."""
 
 import json
 

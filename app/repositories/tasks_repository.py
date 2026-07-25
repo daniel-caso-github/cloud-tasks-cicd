@@ -1,4 +1,4 @@
-"""Acceso a DynamoDB para la entidad Task (ver wiki: task, naming-recursos)."""
+"""DynamoDB access for the Task entity (see wiki: task, naming-recursos)."""
 
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 
@@ -19,7 +19,7 @@ def _from_item(item: dict) -> Task:
 
 
 def put_task(task: Task) -> Task:
-    """Crea o reemplaza una tarea (idempotente por `id`)."""
+    """Create or replace a task (idempotent by `id`)."""
     dynamodb_client().put_item(TableName=get_settings().tasks_table, Item=_to_item(task))
     return task
 

@@ -1,4 +1,4 @@
-"""Punto de entrada del microservicio API (ver wiki: microservicio-api)."""
+"""Entry point of the API microservice (see wiki: microservicio-api)."""
 
 from fastapi import FastAPI
 

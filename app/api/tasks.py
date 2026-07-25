@@ -1,4 +1,4 @@
-"""Router CRUD de tareas (ver wiki: microservicio-api, task)."""
+"""CRUD router for tasks (see wiki: microservicio-api, task)."""
 
 from datetime import datetime, timezone
 

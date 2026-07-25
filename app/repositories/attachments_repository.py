@@ -1,4 +1,4 @@
-"""Acceso a S3 para adjuntos de tareas (ver wiki: task, naming-recursos)."""
+"""S3 access for task attachments (see wiki: task, naming-recursos)."""
 
 from app.aws import s3_client
 from app.config import get_settings

@@ -1,4 +1,4 @@
-"""Endpoint de liveness/readiness."""
+"""Liveness/readiness endpoint."""
 
 from fastapi import APIRouter
 

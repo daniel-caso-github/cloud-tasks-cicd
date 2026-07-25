@@ -1,4 +1,4 @@
-"""Tests unitarios del worker SQS (sin red, moto mockea AWS)."""
+"""Unit tests for the SQS worker (no network, moto mocks AWS)."""
 
 import json
 

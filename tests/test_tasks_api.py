@@ -1,4 +1,4 @@
-"""Tests unitarios del CRUD de tareas (sin red, moto mockea AWS)."""
+"""Unit tests for the task CRUD (no network, moto mocks AWS)."""
 
 import pytest
 

@@ -1,4 +1,4 @@
-"""Fixtures compartidas: mock de AWS en memoria con moto (sin red)."""
+"""Shared fixtures: in-memory AWS mock with moto (no network)."""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,7 +11,7 @@ from app.main import app
 
 @pytest.fixture
 def aws_mock():
-    """Levanta DynamoDB/S3/SQS en memoria con moto y crea los recursos que la app espera."""
+    """Spin up in-memory DynamoDB/S3/SQS with moto and create the resources the app expects."""
     with mock_aws():
         settings = get_settings()
 
@@ -29,5 +29,5 @@ def aws_mock():
 
 @pytest.fixture
 def client(aws_mock):
-    """`TestClient` de FastAPI corriendo contra los mocks de moto."""
+    """FastAPI `TestClient` running against the moto mocks."""
     return TestClient(app)
