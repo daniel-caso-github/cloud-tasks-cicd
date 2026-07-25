@@ -1,0 +1,25 @@
+# Herramientas locales de Claude Code (no se versionan)
+.claude/
+CLAUDE.md
+.mcp.json
+
+# Editor
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Env
+.env
+
+# Docker
+docker/*.log
+
+# CDK
+cdk.out/
