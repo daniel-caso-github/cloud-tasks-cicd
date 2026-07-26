@@ -36,12 +36,16 @@ class TasksStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
         )
 
+        # No auto_delete_objects: that feature relies on a CDK-generated Lambda custom
+        # resource whose runtime (nodejs24.x) is newer than what LocalStack Community's
+        # Lambda emulation supports. Emptying the bucket before destroy is handled instead
+        # by `make cdk-destroy` (see wiki: teardown-y-costos) — same end guarantee, no
+        # extra service dependency.
         bucket = s3.Bucket(
             self,
             "AttachmentsBucket",
             bucket_name=attachments_bucket_name,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            auto_delete_objects=True,
             removal_policy=RemovalPolicy.DESTROY,
         )
 

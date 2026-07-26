@@ -4,7 +4,6 @@
 import os
 
 import aws_cdk as cdk
-
 from stacks.tasks_stack import TasksStack
 
 app = cdk.App()

@@ -6,10 +6,11 @@ validated by a GitHub Actions pipeline.
 
 > Work in progress — see the phase plan in the project's LLM Wiki.
 
-## Infrastructure: two coexisting paths
+## Infrastructure: two alternative paths
 
-The DynamoDB table, S3 bucket and SQS queue can be created two ways, and both are valid at the
-same time (same resource names, both idempotent):
+The DynamoDB table, S3 bucket and SQS queue can be created two ways. They use the same resource
+names and are both idempotent, but they are **alternatives for a given LocalStack instance**, not
+meant to run back-to-back against the same running container (see conflict note below):
 
 1. **Bootstrap script (Phase 2)** — `scripts/bootstrap-localstack.sh` runs automatically as a
    LocalStack init hook every time `make up` starts the stack.
@@ -19,17 +20,27 @@ same time (same resource names, both idempotent):
    ```bash
    npm install -g aws-cdk aws-cdk-local
    pip install -r infra/requirements.txt
-   make up                 # or: docker compose up -d localstack
-   make cdk-deploy          # cdklocal deploy, from infra/
+   make up                 # starts LocalStack (with sts/cloudformation/ssm/iam enabled) + api + worker
+   make cdk-deploy          # cdklocal bootstrap + cdklocal deploy, from infra/
    make cdk-destroy         # cdklocal destroy, from infra/
    ```
 
-   `cdklocal synth` (no LocalStack needed) is confirmed working in this repo. `cdklocal deploy`
-   against a real LocalStack container could not be fully verified in the development environment
-   used to build Phase 3: the installed `aws-cdk` CLI (a very recent 2.x release) fails to resolve
-   AWS account/credentials against LocalStack's fake `000000000000` account even with dummy
-   `test`/`test` credentials exported (`Need to perform AWS calls for account 000000000000, but no
-   credentials have been configured`), which looks like a compatibility gap between that CLI
-   version and `aws-cdk-local`. The stack code itself is standard CDK (no LocalStack-specific
-   hacks) and should deploy normally with a compatible CLI version. If you hit the same error,
-   try pinning an older `aws-cdk` release.
+   Requires `AWS_ACCESS_KEY_ID=test`, `AWS_SECRET_ACCESS_KEY=test`, `AWS_REGION` and
+   `CDK_DEFAULT_ACCOUNT=000000000000` in the environment — `make cdk-deploy`/`cdk-destroy` already
+   export sensible defaults, override `AWS_REGION`/`CDK_DEFAULT_ACCOUNT` if needed.
+
+   **Known conflict**: because `make up` already runs the bootstrap script automatically, running
+   `make cdk-deploy` right after against the *same* LocalStack instance fails —
+   CloudFormation tries to `CreateTable`/`CreateBucket`/`CreateQueue` for names the script already
+   created outside of CDK's control (`ResourceInUseException: Table already exists`). To exercise
+   the CDK path cleanly, start LocalStack **without** the bootstrap init hook (e.g.
+   `docker run -e SERVICES=dynamodb,s3,sqs,sts,cloudformation,ssm,iam -p 4566:4566
+   localstack/localstack:3`, skipping the volume mount that injects
+   `scripts/bootstrap-localstack.sh`) and run `make cdk-deploy` against that. Once resources exist
+   (created by either path), the app itself does not care who created them — it only reads the
+   names from env.
+
+   The S3 bucket does **not** use CDK's `auto_delete_objects`: that feature relies on a
+   CDK-generated Lambda custom resource whose runtime (`nodejs24.x`) is newer than what LocalStack
+   Community's Lambda emulation supports, and pulling in the `lambda` service just for that adds an
+   extra failure surface. `RemovalPolicy.DESTROY` still applies to the bucket itself.
