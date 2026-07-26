@@ -1,0 +1,67 @@
+# Development environment: LocalStack + api + worker (see wiki: localstack, sin-despliegue-real).
+# The `api`/`worker` services here run against the plain python:3.11-slim image with the
+# repo mounted as a volume. The production Dockerfile arrives in Phase 4 and will replace this.
+services:
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3,sqs
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+    volumes:
+      - ./scripts/bootstrap-localstack.sh:/etc/localstack/init/ready.d/bootstrap-localstack.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  api:
+    image: python:3.11-slim
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - TASKS_TABLE=${TASKS_TABLE:-tasks-local}
+      - ATTACHMENTS_BUCKET=${ATTACHMENTS_BUCKET:-attachments-local}
+      - EVENTS_QUEUE=${EVENTS_QUEUE:-task-events-local}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      localstack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  worker:
+    image: python:3.11-slim
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && python -m app.worker"
+    volumes:
+      - .:/app
+    environment:
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - TASKS_TABLE=${TASKS_TABLE:-tasks-local}
+      - ATTACHMENTS_BUCKET=${ATTACHMENTS_BUCKET:-attachments-local}
+      - EVENTS_QUEUE=${EVENTS_QUEUE:-task-events-local}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      localstack:
+        condition: service_healthy
