@@ -7,7 +7,9 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=dynamodb,s3,sqs
+      # sts/cloudformation/ssm/iam are required by the CDK path (Phase 3, `cdklocal`):
+      # bootstrap creates IAM roles + an SSM parameter, and deploy validates credentials via STS.
+      - SERVICES=dynamodb,s3,sqs,sts,cloudformation,ssm,iam
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
